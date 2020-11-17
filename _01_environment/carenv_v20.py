@@ -158,7 +158,7 @@ class CarEnvV20(gym.Env):
             if self.mode_reward == "lin":
                 reward = -int(self.distance - self.currentposition)
             if self.mode_reward == "log":
-                reward = -int(((self.distance - self.currentposition) / 30)** 2)
+                reward = -int(((self.distance - self.currentposition) / 30) ** 2)
             if self.mode_reward == "exp":
                 reward = 1.2**(self.currentposition/30) - 1.2**(self.distance/30)
 
