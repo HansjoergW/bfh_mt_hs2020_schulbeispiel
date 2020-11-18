@@ -8,8 +8,16 @@ def test_simpleagent_cpu():
     print("test cpu")
     env = CarEnvV10()
     agent = SimpleAgentV10(env, "cpu", gamma=GAMMA, buffer_size=REPLAY_SIZE)
+    print(agent.get_net())
 
 def test_simpleagent_cuda():
     print("test cuda")
     env = CarEnvV10()
     agent = SimpleAgentV10(env, "cuda", gamma=GAMMA, buffer_size=REPLAY_SIZE)
+
+
+def test_simpleagent_config():
+    print("test config")
+    env = CarEnvV10()
+    agent = SimpleAgentV10(env, "cuda", gamma=GAMMA, buffer_size=REPLAY_SIZE, hidden_size=16, hidden_layers=2)
+    print(agent.get_net())
