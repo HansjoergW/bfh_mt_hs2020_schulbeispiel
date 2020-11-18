@@ -146,9 +146,9 @@ class CarEnvV20(gym.Env):
         if overshoot:
             if self.mode_reward == "lin":
                 reward = -int(self.currentvelocity * 30)
-            if self.mode_reward == "log":
-                reward = -int(self.currentvelocity ** 2)
             if self.mode_reward == "exp":
+                reward = -int(self.currentvelocity ** 2)
+            if self.mode_reward == "log":
                 reward = 1.2**(self.maxspeed - self.currentvelocity) - 1.2**self.maxspeed
 
             self.is_done = True
@@ -157,9 +157,9 @@ class CarEnvV20(gym.Env):
         if timeup:
             if self.mode_reward == "lin":
                 reward = -int(self.distance - self.currentposition)
-            if self.mode_reward == "log":
-                reward = -int(((self.distance - self.currentposition) / 30) ** 2)
             if self.mode_reward == "exp":
+                reward = -int(((self.distance - self.currentposition) / 30) ** 2)
+            if self.mode_reward == "log":
                 reward = 1.2**(self.currentposition/30) - 1.2**(self.distance/30)
 
             self.is_done = True
