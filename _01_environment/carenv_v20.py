@@ -150,6 +150,8 @@ class CarEnvV20(gym.Env):
                 reward = -int(self.currentvelocity ** 2)
             if self.mode_reward == "log":
                 reward = 1.2**(self.maxspeed - self.currentvelocity) - 1.2**self.maxspeed
+            if self.mode_reward == "log2":
+                reward = 1.22**(self.maxspeed - self.currentvelocity*.5) - 1.22**self.maxspeed
 
             self.is_done = True
             return zero_state, reward, self.is_done, {}
@@ -161,6 +163,8 @@ class CarEnvV20(gym.Env):
                 reward = -int(((self.distance - self.currentposition) / 30) ** 2)
             if self.mode_reward == "log":
                 reward = 1.2**(self.currentposition/30) - 1.2**(self.distance/30)
+            if self.mode_reward == "log2":
+                reward = 1.22**(self.distance/30 - ((self.distance - self.currentposition)/30)*0.5) - 1.22**(self.distance/30)
 
             self.is_done = True
             return zero_state, reward, self.is_done, {}

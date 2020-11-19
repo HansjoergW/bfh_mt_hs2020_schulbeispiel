@@ -26,6 +26,7 @@ HYPERPARAMS = {
         'agent_simple_eps_frames'     : 5*10**5,    # * simpleagent: epsilon frames -> how many frames until 0.02 should be reached .. decay is linear
         'agent_hidden_size'           : 4,        # * Neurons in the hidden layer
         'agent_hidden_layers'         : 1,        # * number of hidden layers
+        'agent_dueling_network'       : False,    # enable dueling agent
 
         # bridge
         'bridge_optimizer'            : None,     # Optimizer -> default ist Adam
@@ -57,6 +58,7 @@ HYPERPARAMS = {
         'agent_simple_eps_frames'     : 5*10**5,    # * simpleagent: epsilon frames -> how many frames until 0.02 should be reached .. decay is linear
         'agent_hidden_size'           : 4,        # * Neurons in the hidden layer
         'agent_hidden_layers'         : 1,        # * number of hidden layers
+        'agent_dueling_network'       : False,    # enable dueling agent
 
         # bridge
         'bridge_optimizer'            : None,     # Optimizer -> default ist Adam
@@ -89,6 +91,7 @@ HYPERPARAMS = {
         'agent_simple_eps_frames'     : 5*10**5,    # * simpleagent: epsilon frames -> how many frames until 0.02 should be reached .. decay is linear
         'agent_hidden_size'           : 32,        # * Neurons in the hidden layer
         'agent_hidden_layers'         : 1,        # * number of hidden layers
+        'agent_dueling_network'       : False,    # enable dueling agent
 
         # bridge
         'bridge_optimizer'            : None,     # Optimizer -> default ist Adam
@@ -121,6 +124,7 @@ HYPERPARAMS = {
         'agent_simple_eps_frames'     : 5*10**5,    # * simpleagent: epsilon frames -> how many frames until 0.02 should be reached .. decay is linear
         'agent_hidden_size'           : 32,        # * Neurons in the hidden layer
         'agent_hidden_layers'         : 2,        # * number of hidden layers
+        'agent_dueling_network'       : False,    # enable dueling agent
 
         # bridge
         'bridge_optimizer'            : None,     # Optimizer -> default ist Adam
@@ -152,6 +156,7 @@ HYPERPARAMS = {
         'agent_simple_eps_frames'     : 5*10**5,    # * simpleagent: epsilon frames -> how many frames until 0.02 should be reached .. decay is linear
         'agent_hidden_size'           : 32,        # * Neurons in the hidden layer
         'agent_hidden_layers'         : 3,        # * number of hidden layers
+        'agent_dueling_network'       : False,    # enable dueling agent
 
         # bridge
         'bridge_optimizer'            : None,     # Optimizer -> default ist Adam
@@ -183,6 +188,7 @@ HYPERPARAMS = {
         'agent_simple_eps_frames'     : 5*10**5,    # * simpleagent: epsilon frames -> how many frames until 0.02 should be reached .. decay is linear
         'agent_hidden_size'           : 64,        # * Neurons in the hidden layer
         'agent_hidden_layers'         : 2,        # * number of hidden layers
+        'agent_dueling_network'       : False,    # enable dueling agent
 
         # bridge
         'bridge_optimizer'            : None,     # Optimizer -> default ist Adam
@@ -215,7 +221,8 @@ def create_control(params: SimpleNamespace, config_name) -> LoopControlV10:
                         eps_final       = params.agent_simple_eps_final,
                         eps_frames      = params.agent_simple_eps_frames,
                         hidden_size     = params.agent_hidden_size,
-                        hidden_layers   = params.agent_hidden_layers
+                        hidden_layers   = params.agent_hidden_layers,
+                        dueling_network = params.agent_dueling_network
                         )
 
     bridge = SimpleBridgeV10(agent=agent,
