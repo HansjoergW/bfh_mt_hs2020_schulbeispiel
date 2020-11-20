@@ -50,6 +50,25 @@ class DuelingNet(nn.Module):
         return qvals
 
 
+class CombinedReplayBuffer(ptan.experience.ExperienceReplayBuffer):
+    # https://arxiv.org/pdf/1712.01275.pdf
+
+    def __init__(self, experience_source, buffer_size):
+        super(CombinedReplayBuffer, self).__init__(experience_source, buffer_size)
+        self.last_added = None
+
+    def _add(self, sample):
+        self.last_added = sample
+        super()._add(sample)
+
+    def sample(self, batch_size):
+        batch = super().sample(batch_size)
+        if self.last_added is not None:
+            batch[0] = self.last_added
+
+        return batch
+
+
 # class ArgmaxActionSelector(ptan.actions.ActionSelector):
 #     """
 #     Selects actions using argmax
@@ -76,7 +95,8 @@ class SimpleAgentV10(AgentBase):
                  hidden_size:int = 128,
                  hidden_layers:int = 1,
                  dueling_network:bool = False,
-                 steps_count:int = 1):
+                 steps_count:int = 1,
+                 use_combined_replay_buffer:bool = False):
 
         super(SimpleAgentV10, self).__init__(env, devicestr)
 
@@ -100,7 +120,11 @@ class SimpleAgentV10(AgentBase):
         self.agent = ptan.agent.DQNAgent(self.net, self.selector, device = self.device)
 
         self.exp_source = ptan.experience.ExperienceSourceFirstLast(self.env, self.agent, gamma=gamma, steps_count = steps_count)
-        self.buffer = ptan.experience.ExperienceReplayBuffer(self.exp_source, buffer_size=buffer_size)
+
+        if use_combined_replay_buffer:
+            self.buffer = CombinedReplayBuffer(self.exp_source, buffer_size=buffer_size)
+        else:
+            self.buffer = ptan.experience.ExperienceReplayBuffer(self.exp_source, buffer_size=buffer_size)
 
     def _config_simple_net(self) -> nn.Module:
         return SimpleNet(self.env.observation_space.shape[0], self.env.action_space.n,
