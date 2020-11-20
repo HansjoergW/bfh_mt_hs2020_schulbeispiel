@@ -589,5 +589,5 @@ if __name__ == '__main__':
 
     #run_example("dueling_net_log_hl_2_hs_32")
 
-    run_example("combined_replay_buffer_hl_2_hs_32")
-    #run_example("nstep_5_log_hl_2_hs_32")
+    #run_example("combined_replay_buffer_hl_2_hs_32")
+    run_example("nstep_5_log_hl_2_hs_32")
