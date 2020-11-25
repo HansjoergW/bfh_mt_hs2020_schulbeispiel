@@ -1,5 +1,5 @@
 from _03_bridge.base_bridge import BridgeBase
-from _04_loopcontrol.base_loop_control import LoopControlBase, TimeHandler
+from _04_loopcontrol.base_loop_control import LoopControlBase, TimeHandler, update_smoothed_metrics
 
 from datetime import timedelta, datetime
 
@@ -26,13 +26,33 @@ class LoopControlV10(LoopControlBase):
         @self.engine.on(EpisodeEvents.EPISODE_COMPLETED)
         def episode_completed(trainer: Engine):
             self.episode_completed_basic(trainer)
+            reward = trainer.state.metrics['reward']
+            steps = trainer.state.metrics['steps']
+
+            distance = self.bridge.agent.env.last_currentposition
+            trainer.state.metrics['distance'] = distance
+            velocity = distance / steps if steps > 0 else 0
+            trainer.state.metrics['velocity'] = velocity
+            trainer.state.metrics['energy'] = self.bridge.agent.env.last_usedenergy
+
+            update_smoothed_metrics(0.98, trainer,
+                                ('avg_reward', 'avg_steps', 'avg_velocity', 'avg_energy'),
+                                (reward, steps, velocity, self.bridge.agent.env.last_usedenergy))
+
 
         @self.engine.on(EpisodeEvents.BOUND_REWARD_REACHED)
         def game_solved(trainer: Engine):
             self.game_solved_basic(trainer)
 
+
         if self.logtb:
             handler = OutputHandler(tag="episodes", metric_names=['reward', 'steps', 'avg_reward'])
+            self.tblogger.attach(self.engine, log_handler=handler, event_name=EpisodeEvents.EPISODE_COMPLETED)
+
+            handler = OutputHandler(tag="episodes2", metric_names=['distance', 'velocity', 'energy'])
+            self.tblogger.attach(self.engine, log_handler=handler, event_name=EpisodeEvents.EPISODE_COMPLETED)
+
+            handler = OutputHandler(tag="episodes3", metric_names=['avg_steps', 'avg_velocity', 'avg_energy'])
             self.tblogger.attach(self.engine, log_handler=handler, event_name=EpisodeEvents.EPISODE_COMPLETED)
 
             handler = OutputHandler(tag="train", metric_names=['avg_loss'], output_transform=lambda a: a)

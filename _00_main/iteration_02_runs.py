@@ -191,7 +191,8 @@ def create_control(params: SimpleNamespace, config_name) -> LoopControlV10:
                  mode_random           = params.env_mode_random,
                  mode_limit_steps      = params.env_mode_limit_steps,
                  mode_time_penalty     = params.env_mode_time_penalty,
-                 mode_reward           = params.env_mode_reward)
+                 mode_reward           = params.env_mode_reward,
+                    )
 
     agent = SimpleAgentV10(env,
                         devicestr  = params.agent_device,

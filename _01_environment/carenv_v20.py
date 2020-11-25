@@ -31,7 +31,7 @@ class CarEnvV20(gym.Env):
     - penalty of -1 point for every time step that passes
     """
     def __init__(self, mode_energy_penalty:bool = False, mode_random:bool = False, mode_limit_steps:bool = False,
-                 mode_time_penalty:bool = False, mode_reward:str = "lin"):
+                 mode_time_penalty:bool = False, mode_reward:str = "lin", stop_area:int = 1):
         super(CarEnvV20, self).__init__()
 
         self.mode_energy_penalty = mode_energy_penalty
@@ -43,7 +43,7 @@ class CarEnvV20(gym.Env):
         # define distance
         self.distance: float = 1000.0
         self.maxspeed: float = 35.0 # maxspeed 35/ms
-        self.velocityenergy_unit: float = 10.0 # 1 second at the speed of velocityenergy_unit uses 1 energy unit
+        self.velocityenergy_unit: float = 10.0 # traveling 10 meters at the speed of velocityenergyunit uses 1 energy unit
         self.accelerationenergy_factor: float = 0.05 # acceleration uses an extra amount of engergy
         self.max_timesteps = int(self.distance)
 
@@ -51,6 +51,7 @@ class CarEnvV20(gym.Env):
         self.currentvelocity: float = 0.0
         self.usedenergy: float = 0.0
         self.is_done: bool = False
+        self.stop_area: int = stop_area
 
 
         # definition of observation value array
@@ -72,8 +73,15 @@ class CarEnvV20(gym.Env):
 
         self.step_index = 0
 
+        self.last_currentposition = self.currentposition
+        self.last_currentvelocity = self.currentvelocity
+        self.last_usedenergy      = self.usedenergy
 
     def reset(self):
+        self.last_currentposition = self.currentposition
+        self.last_currentvelocity = self.currentvelocity
+        self.last_usedenergy = self.usedenergy
+
         self.currentposition = 0.0
         self.currentvelocity = 0.0
         self.usedenergy = 0.0
@@ -112,7 +120,8 @@ class CarEnvV20(gym.Env):
         if action==0:
             # accelerate
             self._set_new_velocity(1.0)
-            energy_for_step = (self.currentvelocity / self.velocityenergy_unit) * (1 + self.accelerationenergy_factor)
+            # energy for step = distance in 10m parts  * energy factor for velocity * acceleration factor
+            energy_for_step = (self.currentvelocity / 10) * (self.currentvelocity / self.velocityenergy_unit) * (1 + self.accelerationenergy_factor)
 
         if action==1:
             # break
@@ -121,21 +130,18 @@ class CarEnvV20(gym.Env):
 
         if action==2:
             # keep velocity
-            energy_for_step = (self.currentvelocity / self.velocityenergy_unit)
+            energy_for_step = (self.currentvelocity / 10) * (self.currentvelocity / self.velocityenergy_unit)
 
         if action==3:
             # declutch
             self._set_new_velocity(-0.1)
             energy_for_step = 0.0 # declutch doesn't use energy
 
-        if self.mode_random:
-            self.currentvelocity += self.currentvelocity * random.uniform(-0.2, +0.2)
-
         self.currentposition += self.currentvelocity
         self.step_index      += 1
         self.usedenergy      += energy_for_step
 
-        goal_reached = bool(self.currentposition > self.distance -1
+        goal_reached = bool(self.currentposition > self.distance - self.stop_area
                             and self.currentposition <= self.distance
                             and abs(self.currentvelocity - 0.0)<0.00001)
 
